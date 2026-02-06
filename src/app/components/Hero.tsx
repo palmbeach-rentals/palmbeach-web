@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 interface HeroProps {
@@ -7,6 +7,41 @@ interface HeroProps {
 
 export function Hero({ onNavigate }: HeroProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // iOS Safari fallback: programmatically play the video
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const tryPlay = () => {
+      video.play().catch(() => {
+        // If autoplay fails (e.g. iOS Low Power Mode), ensure poster shows
+        // and hide video controls
+      });
+    };
+
+    // Try to play once video has enough data
+    if (video.readyState >= 3) {
+      tryPlay();
+    } else {
+      video.addEventListener('canplay', tryPlay, { once: true });
+    }
+
+    // Also retry on visibility change (iOS pauses background tabs)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        tryPlay();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      video.removeEventListener('canplay', tryPlay);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start']
@@ -22,14 +57,18 @@ export function Hero({ onNavigate }: HeroProps) {
     <section id="hero" ref={sectionRef} className="relative h-[100svh] w-full overflow-hidden">
       {/* Background Video with Parallax */}
       <motion.div className="absolute inset-0" style={{ scale: videoScale }}>
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
-          className="w-full h-full object-cover"
+          ref={videoRef}
+          className="w-full h-full object-cover [&::-webkit-media-controls]:!hidden [&::-webkit-media-controls-start-playback-button]:!hidden [&::-webkit-media-controls-panel]:!hidden"
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           poster="/media/images/cars/supercars-trio-front-lineup-coastal-hero.jpg"
         >
+          <source src="/media/videos/coastal-supercars.webm" type="video/webm" />
           <source src="/media/videos/coastal-supercars.mp4" type="video/mp4" />
         </video>
         {/* Multi-layer gradient for depth */}
