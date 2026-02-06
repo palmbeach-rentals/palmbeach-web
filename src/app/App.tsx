@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { Collection } from './components/Collection';
@@ -11,7 +12,8 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    setIsLoaded(true);
+    const timer = setTimeout(() => setIsLoaded(true), 1200);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleNavigate = (section: string) => {
@@ -21,28 +23,72 @@ export default function App() {
     }
   };
 
-  if (!isLoaded) {
-    return (
-      <div className="fixed inset-0 bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-foreground/60 tracking-widest text-sm">Loading Experience</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navigation onNavigate={handleNavigate} />
-      <main>
-        <Hero onNavigate={handleNavigate} />
-        <Collection />
-        <Yacht onNavigate={handleNavigate} />
-        <Experience />
-        <Reservation />
-      </main>
-      <Footer />
-    </div>
+    <>
+      {/* Premium Loading Screen */}
+      <AnimatePresence>
+        {!isLoaded && (
+          <motion.div
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[100] bg-background flex items-center justify-center"
+          >
+            <div className="text-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative h-16 lg:h-20 mx-auto mb-8"
+              >
+                {/* White logo fades out as color fades in */}
+                <motion.img
+                  src="/media/images/logo/logo-white.png"
+                  alt=""
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
+                  className="h-16 lg:h-20 w-auto mx-auto absolute inset-0 m-auto object-contain"
+                />
+                <motion.img
+                  src="/media/images/logo/logo-color.png"
+                  alt="Palm Beach Exotic Rentals"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
+                  className="h-16 lg:h-20 w-auto mx-auto object-contain"
+                />
+              </motion.div>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: 120 }}
+                transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent mx-auto mb-6"
+              />
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.4 }}
+                className="text-foreground/40 tracking-[0.3em] text-xs uppercase"
+              >
+                Palm Beach, Florida
+              </motion.p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Site */}
+      <div className="min-h-screen bg-background text-foreground">
+        <Navigation onNavigate={handleNavigate} />
+        <main>
+          <Hero onNavigate={handleNavigate} />
+          <Collection />
+          <Yacht onNavigate={handleNavigate} />
+          <Experience />
+          <Reservation />
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 }
