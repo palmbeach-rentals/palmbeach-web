@@ -40,6 +40,16 @@ export function Navigation({ onNavigate }: NavigationProps) {
     return () => observer.disconnect();
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
   const handleNav = (section: string) => {
     setMobileOpen(false);
     onNavigate(section);
@@ -64,27 +74,27 @@ export function Navigation({ onNavigate }: NavigationProps) {
             : 'bg-gradient-to-b from-background/50 to-transparent'
         }`}
       >
-        <div className="container mx-auto px-6 lg:px-12">
+        <div className="container mx-auto px-5 lg:px-12">
           <div className="flex items-center justify-between h-20 lg:h-24">
-            {/* Logo - Crossfade between white and color */}
+            {/* Logo - Fixed container with opacity-only crossfade (no position change = no layout shift) */}
             <button
               onClick={() => handleNav('hero')}
-              className="relative z-50 group"
+              className="relative z-50 group flex-shrink-0"
               aria-label="Palm Beach Exotic Rentals"
             >
-              <div className="relative h-12 lg:h-16 w-auto">
-                {/* White logo */}
-                <img
-                  src="/media/images/logo/logo-white.png"
-                  alt=""
-                  className="h-12 lg:h-16 w-auto transition-all duration-500 group-hover:brightness-125"
-                  style={{ opacity: scrolled ? 0 : 1, position: scrolled ? 'absolute' : 'relative', top: 0, left: 0 }}
-                />
-                {/* Color logo */}
+              <div className="relative">
+                {/* Color logo is always in-flow (position: relative), provides stable container width */}
                 <img
                   src="/media/images/logo/logo-color.png"
                   alt="Palm Beach Exotic Rentals"
-                  className="h-12 lg:h-16 w-auto transition-all duration-500 absolute top-0 left-0 group-hover:brightness-110 group-hover:drop-shadow-[0_0_8px_rgba(201,169,97,0.3)]"
+                  className="h-14 lg:h-20 w-auto transition-opacity duration-500 group-hover:drop-shadow-[0_0_12px_rgba(201,169,97,0.35)]"
+                  style={{ opacity: scrolled ? 0 : 1 }}
+                />
+                {/* White logo absolutely positioned on top - only opacity changes, never position */}
+                <img
+                  src="/media/images/logo/logo-white.png"
+                  alt=""
+                  className="absolute top-0 left-0 h-14 lg:h-20 w-auto transition-opacity duration-500 group-hover:brightness-125"
                   style={{ opacity: scrolled ? 1 : 0 }}
                 />
               </div>
@@ -121,7 +131,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden relative z-50 w-10 h-10 flex items-center justify-center"
+              className="md:hidden relative z-50 w-11 h-11 flex items-center justify-center"
               aria-label="Toggle menu"
             >
               <div className="w-6 flex flex-col gap-1.5">
@@ -164,16 +174,29 @@ export function Navigation({ onNavigate }: NavigationProps) {
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-40 bg-background/98 backdrop-blur-xl md:hidden"
           >
-            <div className="flex flex-col items-center justify-center h-full gap-8">
+            <div className="flex flex-col items-center justify-center h-full gap-7">
+              {/* Logo in mobile menu */}
+              <motion.img
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                src="/media/images/logo/logo-color.png"
+                alt="Palm Beach Exotic Rentals"
+                className="h-20 w-auto mb-4"
+              />
+              <div className="gold-line w-12 mb-4" />
+
               {navLinks.map((link, i) => (
                 <motion.button
                   key={link.section}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.25, delay: i * 0.05 }}
+                  transition={{ duration: 0.25, delay: 0.1 + i * 0.05 }}
                   onClick={() => handleNav(link.section)}
-                  className="text-2xl tracking-[0.2em] uppercase text-foreground/80 hover:text-accent transition-colors duration-300"
+                  className={`text-2xl tracking-[0.2em] uppercase transition-colors duration-300 min-h-[44px] flex items-center ${
+                    activeSection === link.section ? 'text-accent' : 'text-foreground/80 hover:text-accent'
+                  }`}
                   style={{ fontFamily: 'var(--font-serif)' }}
                 >
                   {link.label}
@@ -183,13 +206,12 @@ export function Navigation({ onNavigate }: NavigationProps) {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25, delay: 0.25 }}
-                className="mt-4"
+                transition={{ duration: 0.25, delay: 0.35 }}
+                className="mt-4 w-full px-10"
               >
-                <div className="gold-line w-16 mx-auto mb-8" />
                 <button
                   onClick={() => handleNav('reservation')}
-                  className="px-10 py-4 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase"
+                  className="w-full px-10 py-4 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase min-h-[48px]"
                 >
                   Reserve Now
                 </button>

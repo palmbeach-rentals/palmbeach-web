@@ -30,28 +30,28 @@ export function Experience() {
 
   const stats = [
     { value: '10+', label: 'Years of Excellence' },
-    { value: '6', label: 'Exotic Vehicles' },
+    { value: '3', label: 'Exotic Supercars' },
     { value: '500+', label: 'Satisfied Clients' },
     { value: '24/7', label: 'Concierge Support' },
   ];
 
   return (
-    <section id="experience" className="py-24 lg:py-36 bg-background">
-      <div className="container mx-auto px-6 lg:px-12">
+    <section id="experience" className="py-20 lg:py-36 bg-background">
+      <div className="container mx-auto px-5 lg:px-12">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-20 lg:mb-28"
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-14 lg:mb-28"
         >
-          <span className="text-accent text-xs tracking-[0.4em] uppercase block mb-6">
+          <span className="text-accent text-[10px] lg:text-xs tracking-[0.4em] uppercase block mb-5">
             Why Choose Us
           </span>
           <h2
             style={{ fontFamily: 'var(--font-serif)' }}
-            className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-6 tracking-tight"
+            className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl text-foreground mb-5 tracking-tight"
           >
             More Than a Rental
           </h2>
@@ -59,16 +59,16 @@ export function Experience() {
             initial={{ width: 0 }}
             whileInView={{ width: 60 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent mx-auto mb-6"
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent mx-auto mb-5"
           />
-          <p className="text-base lg:text-lg text-foreground/50 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm lg:text-lg text-foreground/50 max-w-2xl mx-auto leading-relaxed px-4">
             We don't simply rent vehicles. We provide access to experiences that define Palm Beach luxury.
           </p>
         </motion.div>
 
         {/* Values Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 mb-24 lg:mb-32 border border-border">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 mb-16 lg:mb-32 border border-border">
           {values.map((value, index) => {
             const Icon = value.icon;
             return (
@@ -77,17 +77,17 @@ export function Experience() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
-                className={`p-10 lg:p-14 text-center group hover:bg-muted/30 transition-colors duration-700 ${
-                  index < 2 ? 'md:border-r border-b md:border-b-0 border-border' : ''
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className={`p-6 lg:p-14 text-center group hover:bg-muted/30 transition-colors duration-500 ${
+                  index < 2 ? 'border-b md:border-b-0 md:border-r border-border' : ''
                 }`}
               >
-                <div className="w-14 h-14 mx-auto mb-8 border border-accent/30 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all duration-700">
-                  <Icon className="w-5 h-5 text-accent/60 group-hover:text-accent transition-colors duration-700" />
+                <div className="w-12 h-12 lg:w-14 lg:h-14 mx-auto mb-5 lg:mb-8 border border-accent/30 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all duration-500">
+                  <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-accent/60 group-hover:text-accent transition-colors duration-500" />
                 </div>
                 <h3
                   style={{ fontFamily: 'var(--font-serif)' }}
-                  className="text-2xl lg:text-3xl text-foreground mb-4 tracking-tight"
+                  className="text-xl lg:text-3xl text-foreground mb-3 lg:mb-4 tracking-tight"
                 >
                   {value.title}
                 </h3>
@@ -104,8 +104,8 @@ export function Experience() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.8 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-24 lg:mb-32"
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-12 mb-16 lg:mb-32"
         >
           {stats.map((stat, i) => (
             <motion.div
@@ -113,16 +113,16 @@ export function Experience() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="text-center"
+              transition={{ duration: 0.35, delay: i * 0.07 }}
+              className="text-center py-4 lg:py-0"
             >
               <p
-                className="text-3xl lg:text-4xl xl:text-5xl text-accent mb-2"
+                className="text-2xl lg:text-4xl xl:text-5xl text-accent mb-1 lg:mb-2"
                 style={{ fontFamily: 'var(--font-serif)' }}
               >
                 {stat.value}
               </p>
-              <p className="text-foreground/30 text-[10px] lg:text-xs tracking-[0.2em] uppercase">
+              <p className="text-foreground/30 text-[9px] lg:text-xs tracking-[0.2em] uppercase">
                 {stat.label}
               </p>
             </motion.div>
@@ -133,10 +133,10 @@ export function Experience() {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 1 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.5 }}
           ref={imageRef}
-          className="relative h-[50vh] lg:h-[70vh] overflow-hidden"
+          className="relative h-[40vh] lg:h-[70vh] overflow-hidden -mx-5 lg:mx-0"
         >
           <motion.img
             style={{ y: imageY }}
@@ -151,14 +151,14 @@ export function Experience() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
               >
-                <span className="text-accent text-xs tracking-[0.4em] uppercase block mb-6">
+                <span className="text-accent text-[10px] lg:text-xs tracking-[0.4em] uppercase block mb-4 lg:mb-6">
                   Palm Beach, Florida
                 </span>
                 <h3
                   style={{ fontFamily: 'var(--font-serif)' }}
-                  className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-foreground tracking-tight leading-tight"
+                  className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl text-foreground tracking-tight leading-tight"
                 >
                   Where the Road Meets the Extraordinary
                 </h3>

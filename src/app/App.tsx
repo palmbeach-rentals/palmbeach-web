@@ -38,24 +38,25 @@ export default function App() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="relative h-16 lg:h-20 mx-auto mb-8"
+                className="relative mx-auto mb-8"
               >
-                {/* White logo fades out as color fades in */}
-                <motion.img
-                  src="/media/images/logo/logo-white.png"
-                  alt=""
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 0 }}
-                  transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
-                  className="h-16 lg:h-20 w-auto mx-auto absolute inset-0 m-auto object-contain"
-                />
+                {/* Color logo provides layout dimensions */}
                 <motion.img
                   src="/media/images/logo/logo-color.png"
                   alt="Palm Beach Exotic Rentals"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
-                  className="h-16 lg:h-20 w-auto mx-auto object-contain"
+                  className="h-24 lg:h-32 w-auto mx-auto"
+                />
+                {/* White logo overlays on top, fades out */}
+                <motion.img
+                  src="/media/images/logo/logo-white.png"
+                  alt=""
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5, ease: 'easeInOut' }}
+                  className="h-24 lg:h-32 w-auto absolute top-0 left-1/2 -translate-x-1/2"
                 />
               </motion.div>
               <motion.div
