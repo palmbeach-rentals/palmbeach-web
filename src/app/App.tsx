@@ -79,7 +79,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main Site */}
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
         <Navigation onNavigate={handleNavigate} />
         <main>
           <Hero onNavigate={handleNavigate} />
