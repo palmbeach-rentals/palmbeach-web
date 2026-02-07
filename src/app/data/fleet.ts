@@ -3,7 +3,7 @@ export interface Vehicle {
   name: string;
   tagline: string;
   year: string;
-  brand: 'Maserati' | 'McLaren' | 'Porsche';
+  brand: 'Maserati' | 'McLaren' | 'Porsche' | 'Chevrolet' | 'Cadillac';
   category: 'exotic' | 'luxury';
   description: string;
   specs: {
@@ -122,6 +122,68 @@ export const vehicles: Vehicle[] = [
       '/media/images/cars/porsche-911-turbo-s-front-three-quarter-top.jpg',
       '/media/images/cars/porsche-911-turbo-s-side-three-quarter-lifestyle.jpg',
       '/media/images/cars/porsche-911-turbo-s-front-three-quarter-low.jpg'
+    ]
+  },
+  {
+    id: 'chevrolet-corvette-c8',
+    name: 'Chevrolet Corvette C8',
+    tagline: 'American Mid-Engine Legend',
+    year: '2026',
+    brand: 'Chevrolet',
+    category: 'exotic',
+    description: 'The mid-engine revolution that redefined American performance. The Corvette C8 delivers world-class supercar dynamics with unmistakable American muscle soul. Its naturally aspirated V8 sits behind the driver, delivering raw, visceral power through a lightning-fast dual-clutch transmission. From its aggressive stance to its driver-focused cockpit, every element is engineered to dominate both the track and the streets of Palm Beach.',
+    specs: {
+      engine: 'V8 6.2L',
+      power: '495 HP',
+      acceleration: '0-60 in 2.9s'
+    },
+    image: '/media/images/cars/corvette-c8-front-three-quarter-hero.jpg',
+    gallery: [
+      '/media/images/cars/corvette-c8-front-three-quarter-hero.jpg',
+      '/media/images/cars/corvette-c8-front-motion-road.jpg',
+      '/media/images/cars/corvette-c8-front-three-quarter-low.jpg',
+      '/media/images/cars/corvette-c8-side-profile.jpg',
+      '/media/images/cars/corvette-c8-rear-three-quarter.jpg',
+      '/media/images/cars/corvette-c8-interior-cabin-wide.jpg',
+      '/media/images/cars/corvette-c8-interior-steering-detail.jpg',
+      '/media/images/cars/corvette-c8-headlight-detail.jpg',
+      '/media/images/cars/corvette-c8-rear-spoiler-detail.jpg',
+      '/media/images/cars/corvette-c8-front-grille-detail.jpg',
+      '/media/images/cars/corvette-c8-side-motion-blur.jpg',
+      '/media/images/cars/corvette-c8-front-three-quarter-top.jpg',
+      '/media/images/cars/corvette-c8-rear-side-profile.jpg',
+      '/media/images/cars/corvette-c8-front-lifestyle.jpg'
+    ]
+  },
+  {
+    id: 'cadillac-escalade-esv',
+    name: 'Cadillac Escalade ESV',
+    tagline: 'Commanding Presence. Absolute Luxury.',
+    year: '2025',
+    brand: 'Cadillac',
+    category: 'luxury',
+    description: 'The ultimate expression of American luxury on wheels. The Escalade ESV commands every road with its imposing presence and delivers an interior experience that rivals the finest private lounges. Its extended wheelbase provides unmatched passenger space, while the industry-leading 38-inch curved OLED display and Super Cruise hands-free driving technology define the future of luxury travel through Palm Beach and beyond.',
+    specs: {
+      engine: 'V8 6.2L',
+      power: '420 HP',
+      acceleration: '0-60 in 5.9s'
+    },
+    image: '/media/images/cars/escalade-esv-front-three-quarter-hero.jpg',
+    gallery: [
+      '/media/images/cars/escalade-esv-front-three-quarter-hero.jpg',
+      '/media/images/cars/escalade-esv-front-grille-detail.jpg',
+      '/media/images/cars/escalade-esv-side-profile.jpg',
+      '/media/images/cars/escalade-esv-rear-badging.jpg',
+      '/media/images/cars/escalade-esv-interior-led-screen.jpg',
+      '/media/images/cars/escalade-esv-interior-seating.jpg',
+      '/media/images/cars/escalade-esv-interior-steering-wheel.jpg',
+      '/media/images/cars/escalade-esv-crest-badge-detail.jpg',
+      '/media/images/cars/escalade-esv-headlight-detail.jpg',
+      '/media/images/cars/escalade-esv-wheel-detail.jpg',
+      '/media/images/cars/escalade-esv-interior-center-console.jpg',
+      '/media/images/cars/escalade-esv-interior-door-sill.jpg',
+      '/media/images/cars/escalade-esv-front-dominant.jpg',
+      '/media/images/cars/escalade-esv-lifestyle-road.jpg'
     ]
   }
 ];
