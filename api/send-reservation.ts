@@ -1,8 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const BUSINESS_EMAIL = 'palmbeacher.web@gmail.com';
 const FROM_EMAIL = 'Palm Beach Exotic Rentals <reservations@palmbeachexoticrental.com>';
 
@@ -18,7 +16,98 @@ interface ReservationData {
 const LOGO_URL = 'https://www.palmbeachexoticrental.com/media/images/logo/logo-white.png';
 const SITE_URL = 'https://www.palmbeachexoticrental.com';
 
+// --- Security: HTML escaping ---
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// --- Security: Rate limiting ---
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const RATE_LIMIT_MAX = 5;
+const rateLimitMap = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) ?? [];
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  rateLimitMap.set(ip, recent);
+  if (recent.length >= RATE_LIMIT_MAX) return true;
+  recent.push(now);
+  rateLimitMap.set(ip, recent);
+  return false;
+}
+
+// --- Security: Input validation ---
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const FIELD_LIMITS: Record<string, number> = {
+  fullName: 100,
+  email: 254,
+  phone: 30,
+  vehicle: 100,
+  dates: 100,
+  message: 1000,
+};
+
+function validateInput(body: Record<string, unknown>): { valid: true; data: ReservationData } | { valid: false; error: string } {
+  const required = ['fullName', 'email', 'phone', 'vehicle', 'dates'] as const;
+
+  for (const field of required) {
+    if (!body[field] || typeof body[field] !== 'string' || (body[field] as string).trim().length === 0) {
+      return { valid: false, error: `Missing required field: ${field}` };
+    }
+  }
+
+  const trimmed: Record<string, string> = {};
+  for (const key of [...required, 'message'] as const) {
+    const val = body[key];
+    if (val !== undefined && val !== null && typeof val === 'string') {
+      trimmed[key] = val.trim();
+    } else if (key !== 'message') {
+      return { valid: false, error: `Invalid field: ${key}` };
+    }
+  }
+
+  // Length limits
+  for (const [field, maxLen] of Object.entries(FIELD_LIMITS)) {
+    if (trimmed[field] && trimmed[field].length > maxLen) {
+      return { valid: false, error: `${field} exceeds maximum length of ${maxLen} characters` };
+    }
+  }
+
+  // Email format
+  if (!EMAIL_REGEX.test(trimmed.email)) {
+    return { valid: false, error: 'Invalid email format' };
+  }
+
+  return {
+    valid: true,
+    data: {
+      fullName: trimmed.fullName,
+      email: trimmed.email,
+      phone: trimmed.phone,
+      vehicle: trimmed.vehicle,
+      dates: trimmed.dates,
+      message: trimmed.message || undefined,
+    },
+  };
+}
+
 function buildBusinessEmailHtml(data: ReservationData): string {
+  const safe = {
+    fullName: escapeHtml(data.fullName),
+    email: escapeHtml(data.email),
+    phone: escapeHtml(data.phone),
+    vehicle: escapeHtml(data.vehicle),
+    dates: escapeHtml(data.dates),
+    message: data.message ? escapeHtml(data.message) : '',
+  };
+
   const submittedAt = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', dateStyle: 'long', timeStyle: 'short' });
   return `
 <!DOCTYPE html>
@@ -51,7 +140,7 @@ function buildBusinessEmailHtml(data: ReservationData): string {
                   <td style="padding:35px 40px 25px;">
                     <p style="margin:0 0 6px;font-size:11px;color:#C9A961;letter-spacing:3px;text-transform:uppercase;font-weight:600;">New Reservation</p>
                     <h1 style="margin:0;font-size:26px;color:#ffffff;font-weight:300;letter-spacing:-0.3px;">
-                      ${data.fullName}
+                      ${safe.fullName}
                     </h1>
                     <p style="margin:8px 0 0;font-size:13px;color:#555555;">Submitted ${submittedAt} EST</p>
                   </td>
@@ -68,30 +157,30 @@ function buildBusinessEmailHtml(data: ReservationData): string {
                       <tr>
                         <td width="50%" style="padding:0 10px 22px 0;vertical-align:top;">
                           <p style="margin:0 0 5px;font-size:10px;color:#C9A961;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Email</p>
-                          <a href="mailto:${data.email}" style="font-size:14px;color:#ffffff;text-decoration:none;word-break:break-all;">${data.email}</a>
+                          <a href="mailto:${safe.email}" style="font-size:14px;color:#ffffff;text-decoration:none;word-break:break-all;">${safe.email}</a>
                         </td>
                         <td width="50%" style="padding:0 0 22px 10px;vertical-align:top;">
                           <p style="margin:0 0 5px;font-size:10px;color:#C9A961;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Phone</p>
-                          <a href="tel:${data.phone}" style="font-size:14px;color:#ffffff;text-decoration:none;">${data.phone}</a>
+                          <a href="tel:${safe.phone}" style="font-size:14px;color:#ffffff;text-decoration:none;">${safe.phone}</a>
                         </td>
                       </tr>
                       <!-- Row: Vehicle & Dates -->
                       <tr>
                         <td width="50%" style="padding:0 10px 22px 0;vertical-align:top;">
                           <p style="margin:0 0 5px;font-size:10px;color:#C9A961;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Vehicle</p>
-                          <p style="margin:0;font-size:14px;color:#ffffff;">${data.vehicle}</p>
+                          <p style="margin:0;font-size:14px;color:#ffffff;">${safe.vehicle}</p>
                         </td>
                         <td width="50%" style="padding:0 0 22px 10px;vertical-align:top;">
                           <p style="margin:0 0 5px;font-size:10px;color:#C9A961;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Preferred Dates</p>
-                          <p style="margin:0;font-size:14px;color:#ffffff;">${data.dates}</p>
+                          <p style="margin:0;font-size:14px;color:#ffffff;">${safe.dates}</p>
                         </td>
                       </tr>
-                      ${data.message ? `
+                      ${safe.message ? `
                       <!-- Row: Message -->
                       <tr>
                         <td colspan="2" style="padding:0 0 8px;">
                           <p style="margin:0 0 5px;font-size:10px;color:#C9A961;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Additional Details</p>
-                          <p style="margin:0;font-size:14px;color:#cccccc;line-height:1.7;background-color:#0a0a0a;border-left:2px solid #C9A961;padding:14px 18px;">${data.message}</p>
+                          <p style="margin:0;font-size:14px;color:#cccccc;line-height:1.7;background-color:#0a0a0a;border-left:2px solid #C9A961;padding:14px 18px;">${safe.message}</p>
                         </td>
                       </tr>
                       ` : ''}
@@ -103,7 +192,7 @@ function buildBusinessEmailHtml(data: ReservationData): string {
                 <tr><td style="padding:0 40px;"><div style="height:1px;background-color:#1a1a1a;"></div></td></tr>
                 <tr>
                   <td style="padding:22px 40px 28px;text-align:center;">
-                    <a href="mailto:${data.email}" style="display:inline-block;padding:12px 32px;background-color:#C9A961;color:#0a0a0a;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Reply to Client</a>
+                    <a href="mailto:${safe.email}" style="display:inline-block;padding:12px 32px;background-color:#C9A961;color:#0a0a0a;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Reply to Client</a>
                   </td>
                 </tr>
               </table>
@@ -127,6 +216,13 @@ function buildBusinessEmailHtml(data: ReservationData): string {
 }
 
 function buildClientConfirmationHtml(data: ReservationData): string {
+  const safe = {
+    fullName: escapeHtml(data.fullName),
+    vehicle: escapeHtml(data.vehicle),
+    dates: escapeHtml(data.dates),
+    message: data.message ? escapeHtml(data.message) : '',
+  };
+
   return `
 <!DOCTYPE html>
 <html>
@@ -163,7 +259,7 @@ function buildClientConfirmationHtml(data: ReservationData): string {
                       </tr>
                     </table>
                     <h1 style="margin:0 0 10px;font-size:28px;color:#ffffff;font-weight:300;letter-spacing:-0.3px;">
-                      Thank You, ${data.fullName}
+                      Thank You, ${safe.fullName}
                     </h1>
                     <div style="width:40px;height:2px;background-color:#C9A961;margin:0 auto 18px;"></div>
                     <p style="margin:0;font-size:15px;color:#888888;line-height:1.8;max-width:420px;display:inline-block;">
@@ -186,21 +282,21 @@ function buildClientConfirmationHtml(data: ReservationData): string {
                             <tr>
                               <td width="50%" style="vertical-align:top;">
                                 <p style="margin:0 0 4px;font-size:10px;color:#666666;text-transform:uppercase;letter-spacing:1.5px;">Vehicle</p>
-                                <p style="margin:0;font-size:15px;color:#ffffff;font-weight:400;">${data.vehicle}</p>
+                                <p style="margin:0;font-size:15px;color:#ffffff;font-weight:400;">${safe.vehicle}</p>
                               </td>
                               <td width="50%" style="vertical-align:top;">
                                 <p style="margin:0 0 4px;font-size:10px;color:#666666;text-transform:uppercase;letter-spacing:1.5px;">Preferred Dates</p>
-                                <p style="margin:0;font-size:15px;color:#ffffff;font-weight:400;">${data.dates}</p>
+                                <p style="margin:0;font-size:15px;color:#ffffff;font-weight:400;">${safe.dates}</p>
                               </td>
                             </tr>
                           </table>
                         </td>
                       </tr>
-                      ${data.message ? `
+                      ${safe.message ? `
                       <tr>
                         <td style="padding:20px 24px;">
                           <p style="margin:0 0 4px;font-size:10px;color:#666666;text-transform:uppercase;letter-spacing:1.5px;">Your Notes</p>
-                          <p style="margin:0;font-size:14px;color:#cccccc;line-height:1.6;">${data.message}</p>
+                          <p style="margin:0;font-size:14px;color:#cccccc;line-height:1.6;">${safe.message}</p>
                         </td>
                       </tr>
                       ` : ''}
@@ -303,25 +399,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { fullName, email, phone, vehicle, dates, message } = req.body as ReservationData;
-
-  if (!fullName || !email || !phone || !vehicle || !dates) {
-    return res.status(400).json({ error: 'Missing required fields: fullName, email, phone, vehicle, dates' });
+  // Validate API key exists
+  if (!process.env.RESEND_API_KEY) {
+    console.error('RESEND_API_KEY environment variable is not configured');
+    return res.status(500).json({ error: 'Email service is not configured' });
   }
 
-  const data: ReservationData = { fullName, email, phone, vehicle, dates, message };
+  // Rate limiting by IP
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  // Validate and sanitize input
+  const result = validateInput(req.body ?? {});
+  if (!result.valid) {
+    return res.status(400).json({ error: result.error });
+  }
+
+  const data = result.data;
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
     await Promise.all([
       resend.emails.send({
         from: FROM_EMAIL,
         to: BUSINESS_EMAIL,
-        subject: `New Reservation Request — ${fullName}`,
+        subject: `New Reservation Request — ${escapeHtml(data.fullName)}`,
         html: buildBusinessEmailHtml(data),
       }),
       resend.emails.send({
         from: FROM_EMAIL,
-        to: email,
+        to: data.email,
         subject: 'Your Reservation Request — Palm Beach Exotic Rentals',
         html: buildClientConfirmationHtml(data),
       }),

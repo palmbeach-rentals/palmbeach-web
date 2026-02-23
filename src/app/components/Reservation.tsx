@@ -21,11 +21,20 @@ export function Reservation() {
     setLoading(true);
     setError('');
 
+    const trimmedData = {
+      fullName: formData.fullName.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      vehicle: formData.vehicle.trim(),
+      dates: formData.dates.trim(),
+      message: formData.message.trim(),
+    };
+
     try {
       const res = await fetch('/api/send-reservation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(trimmedData),
       });
 
       if (!res.ok) {
