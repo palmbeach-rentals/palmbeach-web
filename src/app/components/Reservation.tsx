@@ -5,6 +5,8 @@ import { vehicles, yacht } from '../data/fleet';
 
 export function Reservation() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -14,10 +16,29 @@ export function Reservation() {
     message: '',
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    console.log('Reservation request:', formData);
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/send-reservation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || 'Something went wrong. Please try again.');
+      }
+
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (
@@ -248,15 +269,35 @@ export function Reservation() {
               />
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-400 text-sm text-center py-3 px-4 border border-red-400/20 bg-red-400/5">
+                {error}
+              </div>
+            )}
+
             {/* Submit */}
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.01, boxShadow: '0 0 40px rgba(201,169,97,0.2)' }}
-              whileTap={{ scale: 0.99 }}
-              className="group w-full px-10 py-4 lg:py-5 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase transition-all duration-300 hover:bg-accent/90 flex items-center justify-center gap-3 min-h-[48px]"
+              disabled={loading}
+              whileHover={loading ? {} : { scale: 1.01, boxShadow: '0 0 40px rgba(201,169,97,0.2)' }}
+              whileTap={loading ? {} : { scale: 0.99 }}
+              className="group w-full px-10 py-4 lg:py-5 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase transition-all duration-300 hover:bg-accent/90 flex items-center justify-center gap-3 min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Request
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Sending...
+                </>
+              ) : (
+                <>
+                  Submit Request
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                </>
+              )}
             </motion.button>
 
             <p className="text-center text-[10px] lg:text-xs text-foreground/20 leading-relaxed tracking-wide">
