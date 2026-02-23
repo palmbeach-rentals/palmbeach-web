@@ -15,7 +15,7 @@ interface ReservationData {
   message?: string;
 }
 
-const LOGO_URL = 'https://www.palmbeachexoticrental.com/media/images/logo/logo-color.png';
+const LOGO_URL = 'https://www.palmbeachexoticrental.com/media/images/logo/logo-white.png';
 const SITE_URL = 'https://www.palmbeachexoticrental.com';
 
 function buildBusinessEmailHtml(data: ReservationData): string {
