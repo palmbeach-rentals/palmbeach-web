@@ -42,11 +42,11 @@ export function Footer() {
                 <span className="text-sm">(561) 555-1234</span>
               </a>
               <a
-                href="mailto:concierge@palmbeachexotics.com"
+                href="mailto:palmbeacher.web@gmail.com"
                 className="flex items-center gap-3 text-foreground/50 hover:text-accent transition-colors duration-300 group min-h-[44px]"
               >
                 <Mail className="w-4 h-4 text-accent/40 group-hover:text-accent transition-colors duration-300" />
-                <span className="text-sm break-all">concierge@palmbeachexotics.com</span>
+                <span className="text-sm break-all">palmbeacher.web@gmail.com</span>
               </a>
               <div className="flex items-start gap-3 text-foreground/50">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-accent/40" />
