@@ -16,6 +16,8 @@ export function Footer() {
           <img
             src="/media/images/logo/logo-color.png"
             alt="Palm Beach Exotic Rentals"
+            loading="lazy"
+            decoding="async"
             className="h-16 lg:h-20 w-auto mx-auto mb-5 lg:mb-6"
           />
           <p className="text-foreground/40 text-sm max-w-md mx-auto leading-relaxed px-4">

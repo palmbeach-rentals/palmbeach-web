@@ -139,9 +139,11 @@ export function Experience() {
           className="relative h-[40vh] lg:h-[70vh] overflow-hidden -mx-5 lg:mx-0"
         >
           <motion.img
-            style={{ y: imageY }}
+            style={{ y: imageY, willChange: 'transform' }}
             src="/media/images/cars/maserati-mc20-front-motion-coastal.jpg"
             alt="Palm Beach Luxury Experience"
+            loading="lazy"
+            decoding="async"
             className="w-full h-[120%] object-cover absolute -top-[10%] left-0"
           />
           <div className="absolute inset-0 bg-background/50" />

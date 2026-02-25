@@ -75,6 +75,8 @@ export function Collection() {
                         <img
                           src={vehicle.image}
                           alt={vehicle.name}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                         />
                       </div>
@@ -172,6 +174,8 @@ export function Collection() {
               <img
                 src={showcaseImages[0]}
                 alt="Palm Beach Supercars Collection"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-background/80" />

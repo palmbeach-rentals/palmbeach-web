@@ -14,7 +14,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -40,14 +40,31 @@ export function Navigation({ onNavigate }: NavigationProps) {
     return () => observer.disconnect();
   }, []);
 
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when mobile menu is open (iOS Safari compatible)
   useEffect(() => {
     if (mobileOpen) {
-      document.body.style.overflow = 'hidden';
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.dataset.scrollY = String(scrollY);
     } else {
-      document.body.style.overflow = '';
+      const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, savedY);
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, savedY);
+    };
   }, [mobileOpen]);
 
   const handleNav = (section: string) => {
@@ -74,8 +91,8 @@ export function Navigation({ onNavigate }: NavigationProps) {
             : 'bg-gradient-to-b from-background/50 to-transparent'
         }`}
       >
-        <div className="container mx-auto px-5 lg:px-12">
-          <div className="flex items-center justify-between h-20 lg:h-24">
+        <div className="container mx-auto px-5 lg:px-12" style={{ paddingLeft: 'max(1.25rem, env(safe-area-inset-left))', paddingRight: 'max(1.25rem, env(safe-area-inset-right))' }}>
+          <div className="flex items-center justify-between h-20 lg:h-24" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
             {/* Logo - Fixed container with opacity-only crossfade (no position change = no layout shift) */}
             <button
               onClick={() => handleNav('hero')}
@@ -87,6 +104,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
                 <img
                   src="/media/images/logo/logo-color.png"
                   alt="Palm Beach Exotic Rentals"
+                  decoding="async"
                   className="h-14 lg:h-20 w-auto transition-opacity duration-500 group-hover:drop-shadow-[0_0_12px_rgba(201,169,97,0.35)]"
                   style={{ opacity: scrolled ? 0 : 1 }}
                 />
@@ -94,6 +112,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
                 <img
                   src="/media/images/logo/logo-white.png"
                   alt=""
+                  decoding="async"
                   className="absolute top-0 left-0 h-14 lg:h-20 w-auto transition-opacity duration-500 group-hover:brightness-125"
                   style={{ opacity: scrolled ? 1 : 0 }}
                 />
@@ -173,6 +192,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             className="fixed inset-0 z-40 bg-background/98 backdrop-blur-xl md:hidden"
+            style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
           >
             <div className="flex flex-col items-center justify-center h-full gap-7">
               {/* Logo in mobile menu */}
@@ -182,6 +202,7 @@ export function Navigation({ onNavigate }: NavigationProps) {
                 transition={{ duration: 0.3 }}
                 src="/media/images/logo/logo-color.png"
                 alt="Palm Beach Exotic Rentals"
+                decoding="async"
                 className="h-20 w-auto mb-4"
               />
               <div className="gold-line w-12 mb-4" />

@@ -94,6 +94,8 @@ export function Yacht({ onNavigate }: YachtProps) {
                   transition={{ duration: 0.4 }}
                   src={currentGallery[activeImage]}
                   alt={`${yacht.name} - ${activeTab}`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </AnimatePresence>
@@ -157,7 +159,7 @@ export function Yacht({ onNavigate }: YachtProps) {
                       : 'opacity-40 hover:opacity-70'
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -243,6 +245,8 @@ export function Yacht({ onNavigate }: YachtProps) {
           <img
             src="/media/images/yachts/yacht-salon-dining-night.jpeg"
             alt="Luxury Yacht Dining Experience"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-background/40" />

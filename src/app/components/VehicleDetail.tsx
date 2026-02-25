@@ -12,10 +12,23 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
   const gallery = vehicle.gallery && vehicle.gallery.length > 0 ? vehicle.gallery : [vehicle.image];
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // iOS Safari compatible scroll lock
   useEffect(() => {
     setActiveIndex(0);
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    const scrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.dataset.scrollY = String(scrollY);
+    return () => {
+      const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      window.scrollTo(0, savedY);
+    };
   }, [vehicle.id]);
 
   const goNext = useCallback(() => {
@@ -37,7 +50,12 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
   }, [onClose, goNext, goPrev]);
 
   const scrollToReservation = () => {
-    document.body.style.overflow = '';
+    const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    window.scrollTo(0, savedY);
     onClose();
     setTimeout(() => {
       document.getElementById('reservation')?.scrollIntoView({ behavior: 'smooth' });
@@ -88,6 +106,8 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             src={gallery[activeIndex]}
             alt={`${vehicle.name} - ${activeIndex + 1}`}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </AnimatePresence>
@@ -198,6 +218,8 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
                   <img
                     src={image}
                     alt={`${vehicle.name} ${index + 1}`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 </button>

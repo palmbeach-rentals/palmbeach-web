@@ -56,7 +56,7 @@ export function Hero({ onNavigate }: HeroProps) {
   return (
     <section id="hero" ref={sectionRef} className="relative h-[100svh] w-full overflow-hidden">
       {/* Background Video with Parallax */}
-      <motion.div className="absolute inset-0" style={{ scale: videoScale }}>
+      <motion.div className="absolute inset-0" style={{ scale: videoScale, willChange: 'transform' }}>
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           ref={videoRef}
@@ -65,8 +65,10 @@ export function Hero({ onNavigate }: HeroProps) {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/media/images/cars/supercars-trio-front-lineup-coastal-hero.jpg"
+          // @ts-expect-error -- fetchPriority is valid HTML but React types lag behind
+          fetchPriority="high"
         >
           <source src="/media/videos/coastal-supercars.webm" type="video/webm" />
           <source src="/media/videos/coastal-supercars.mp4" type="video/mp4" />
