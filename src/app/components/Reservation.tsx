@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, useCallback, FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { Check, ArrowRight } from 'lucide-react';
 import { vehicles, yacht } from '../data/fleet';
@@ -50,14 +50,15 @@ export function Reservation() {
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      setFormData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    },
+    []
+  );
 
   if (submitted) {
     return (
@@ -279,11 +280,13 @@ export function Reservation() {
             </div>
 
             {/* Error Message */}
-            {error && (
-              <div className="text-red-400 text-sm text-center py-3 px-4 border border-red-400/20 bg-red-400/5">
-                {error}
-              </div>
-            )}
+            <div aria-live="polite">
+              {error && (
+                <div role="alert" className="text-red-400 text-sm text-center py-3 px-4 border border-red-400/20 bg-red-400/5">
+                  {error}
+                </div>
+              )}
+            </div>
 
             {/* Submit */}
             <motion.button

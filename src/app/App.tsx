@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { Collection } from './components/Collection';
-import { Yacht } from './components/Yacht';
-import { Experience } from './components/Experience';
-import { Reservation } from './components/Reservation';
-import { Footer } from './components/Footer';
+
+const Yacht = lazy(() => import('./components/Yacht').then(m => ({ default: m.Yacht })));
+const Experience = lazy(() => import('./components/Experience').then(m => ({ default: m.Experience })));
+const Reservation = lazy(() => import('./components/Reservation').then(m => ({ default: m.Reservation })));
+const Footer = lazy(() => import('./components/Footer').then(m => ({ default: m.Footer })));
 
 export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -16,12 +17,12 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleNavigate = (section: string) => {
+  const handleNavigate = useCallback((section: string) => {
     const element = document.getElementById(section);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-  };
+  }, []);
 
   return (
     <>
@@ -84,11 +85,15 @@ export default function App() {
         <main>
           <Hero onNavigate={handleNavigate} />
           <Collection />
-          <Yacht onNavigate={handleNavigate} />
-          <Experience />
-          <Reservation />
+          <Suspense>
+            <Yacht onNavigate={handleNavigate} />
+            <Experience />
+            <Reservation />
+          </Suspense>
         </main>
-        <Footer />
+        <Suspense>
+          <Footer />
+        </Suspense>
       </div>
     </>
   );

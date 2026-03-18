@@ -94,20 +94,20 @@ export function Footer() {
           >
             <h4 className="text-foreground/30 mb-5 lg:mb-6 tracking-[0.3em] text-[10px] uppercase">Follow</h4>
             <div className="flex gap-3 mb-6 lg:mb-8">
-              <a
-                href="#"
+              <button
+                type="button"
                 className="w-11 h-11 border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-all duration-300 group"
                 aria-label="Instagram"
               >
                 <Instagram className="w-4 h-4 text-foreground/40 group-hover:text-accent transition-colors duration-300" />
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                type="button"
                 className="w-11 h-11 border border-border flex items-center justify-center hover:border-accent hover:text-accent transition-all duration-300 group"
                 aria-label="Facebook"
               >
                 <Facebook className="w-4 h-4 text-foreground/40 group-hover:text-accent transition-colors duration-300" />
-              </a>
+              </button>
             </div>
             <p className="text-foreground/20 text-xs leading-relaxed">
               Stay connected for exclusive releases, seasonal offers, and behind-the-scenes access to the fleet.

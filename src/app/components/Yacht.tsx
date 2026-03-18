@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Anchor, Users, Wine, Waves, Thermometer, Sun, ChevronLeft, ChevronRight } from 'lucide-react';
 import { yacht } from '../data/fleet';
@@ -31,18 +31,18 @@ export function Yacht({ onNavigate }: YachtProps) {
 
   const currentGallery = yacht.gallery[activeTab];
 
-  const handleTabChange = (tab: GalleryTab) => {
+  const handleTabChange = useCallback((tab: GalleryTab) => {
     setActiveTab(tab);
     setActiveImage(0);
-  };
+  }, []);
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     setActiveImage((prev) => (prev + 1) % currentGallery.length);
-  };
+  }, [currentGallery.length]);
 
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     setActiveImage((prev) => (prev - 1 + currentGallery.length) % currentGallery.length);
-  };
+  }, [currentGallery.length]);
 
   return (
     <section id="yacht" className="relative py-20 lg:py-36 bg-card">

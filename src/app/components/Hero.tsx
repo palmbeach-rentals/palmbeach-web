@@ -60,6 +60,7 @@ export function Hero({ onNavigate }: HeroProps) {
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           ref={videoRef}
+          aria-label="Luxury supercars driving along a coastal road in Palm Beach"
           className="w-full h-full object-cover [&::-webkit-media-controls]:!hidden [&::-webkit-media-controls-start-playback-button]:!hidden [&::-webkit-media-controls-panel]:!hidden"
           autoPlay
           muted

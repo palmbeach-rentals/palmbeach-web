@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 interface NavigationProps {
   onNavigate: (section: string) => void;
@@ -11,8 +12,18 @@ export function Navigation({ onNavigate }: NavigationProps) {
   const [activeSection, setActiveSection] = useState('hero');
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const isScrolled = window.scrollY > 50;
+        setScrolled(prev => {
+          if (prev !== isScrolled) return isScrolled;
+          return prev;
+        });
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -41,36 +52,12 @@ export function Navigation({ onNavigate }: NavigationProps) {
   }, []);
 
   // Lock body scroll when mobile menu is open (iOS Safari compatible)
-  useEffect(() => {
-    if (mobileOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.left = '0';
-      document.body.style.right = '0';
-      document.body.dataset.scrollY = String(scrollY);
-    } else {
-      const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      window.scrollTo(0, savedY);
-    }
-    return () => {
-      const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.right = '';
-      window.scrollTo(0, savedY);
-    };
-  }, [mobileOpen]);
+  useScrollLock(mobileOpen);
 
-  const handleNav = (section: string) => {
+  const handleNav = useCallback((section: string) => {
     setMobileOpen(false);
     onNavigate(section);
-  };
+  }, [onNavigate]);
 
   const navLinks = [
     { label: 'Collection', section: 'collection' },
