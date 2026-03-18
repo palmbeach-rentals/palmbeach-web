@@ -30,7 +30,7 @@ export function Experience() {
 
   const stats = [
     { value: '10+', label: 'Years of Excellence' },
-    { value: '3', label: 'Exotic Supercars' },
+    { value: '5', label: 'Exotic Vehicles' },
     { value: '500+', label: 'Satisfied Clients' },
     { value: '24/7', label: 'Concierge Support' },
   ];
@@ -68,7 +68,7 @@ export function Experience() {
         </motion.div>
 
         {/* Values Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 mb-16 lg:mb-32 border border-border">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-16 mb-16 lg:mb-32">
           {values.map((value, index) => {
             const Icon = value.icon;
             return (
@@ -78,11 +78,11 @@ export function Experience() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className={`p-6 lg:p-14 text-center group hover:bg-muted/30 transition-colors duration-500 ${
-                  index < 2 ? 'border-b md:border-b-0 md:border-r border-border' : ''
-                }`}
+                className="p-6 lg:p-14 text-center group transition-all duration-500 relative"
               >
-                <div className="w-12 h-12 lg:w-14 lg:h-14 mx-auto mb-5 lg:mb-8 border border-accent/30 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 transition-all duration-500">
+                {/* Gold accent line at top */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 group-hover:w-12 h-[2px] bg-accent transition-all duration-500" />
+                <div className="w-12 h-12 lg:w-14 lg:h-14 mx-auto mb-5 lg:mb-8 border border-accent/30 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/5 group-hover:shadow-[0_0_30px_rgba(201,169,97,0.15)] transition-all duration-500">
                   <Icon className="w-4 h-4 lg:w-5 lg:h-5 text-accent/60 group-hover:text-accent transition-colors duration-500" />
                 </div>
                 <h3
@@ -105,7 +105,7 @@ export function Experience() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
           transition={{ duration: 0.5 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-12 mb-16 lg:mb-32"
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16 mb-16 lg:mb-32"
         >
           {stats.map((stat, i) => (
             <motion.div

@@ -84,7 +84,7 @@ export function Yacht({ onNavigate }: YachtProps) {
             transition={{ duration: 0.5 }}
           >
             {/* Main Image */}
-            <div className="relative aspect-[4/3] overflow-hidden mb-3 lg:mb-4">
+            <div className="relative aspect-[16/10] overflow-hidden mb-3 lg:mb-4">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={currentGallery[activeImage]}

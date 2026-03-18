@@ -148,6 +148,10 @@ img {
   transition: opacity 0.5s ease;
 }
 
+.text-balance {
+  text-wrap: balance;
+}
+
 /* Premium focus styles */
 input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 1px var(--accent), 0 0 20px rgba(201, 169, 97, 0.1);

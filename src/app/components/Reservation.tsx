@@ -1,4 +1,4 @@
-import { useState, useCallback, FormEvent } from 'react';
+import { useState, useCallback, useEffect, FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { Check, ArrowRight } from 'lucide-react';
 import { vehicles, yacht } from '../data/fleet';
@@ -15,6 +15,18 @@ export function Reservation() {
     dates: '',
     message: '',
   });
+
+  // Listen for vehicle pre-selection from VehicleDetail
+  useEffect(() => {
+    const handleReserve = (e: Event) => {
+      const vehicleId = (e as CustomEvent<string>).detail;
+      if (vehicleId) {
+        setFormData((prev) => ({ ...prev, vehicle: vehicleId }));
+      }
+    };
+    window.addEventListener('reserve-vehicle', handleReserve);
+    return () => window.removeEventListener('reserve-vehicle', handleReserve);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -104,218 +116,236 @@ export function Reservation() {
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
 
       <div className="container mx-auto px-5 lg:px-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-10 lg:mb-18"
-          >
-            <span className="text-accent text-[10px] lg:text-xs tracking-[0.4em] uppercase block mb-5">
-              Begin Your Journey
-            </span>
-            <h2
-              style={{ fontFamily: 'var(--font-serif)' }}
-              className="text-3xl md:text-4xl lg:text-6xl text-foreground mb-5 tracking-tight"
-            >
-              Request Availability
-            </h2>
-            <motion.div
-              initial={{ width: 0 }}
-              whileInView={{ width: 60 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent mx-auto mb-5"
-            />
-            <p className="text-foreground/50 text-sm lg:text-base max-w-lg mx-auto leading-relaxed px-4">
-              Share your details and our team will craft a tailored experience for you.
-            </p>
-          </motion.div>
-
-          {/* Form */}
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            onSubmit={handleSubmit}
-            className="space-y-5 lg:space-y-6"
-          >
-            {/* Row 1: Name */}
-            <div>
-              <label
-                htmlFor="fullName"
-                className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
-              >
-                Full Name *
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
-                placeholder="Your name"
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            {/* Left: Atmospheric Image (desktop only) */}
+            <div className="hidden lg:block relative overflow-hidden">
+              <img
+                src="/media/images/cars/maserati-mc20-front-symmetric-doors-open.jpg"
+                alt="Maserati MC20 with butterfly doors open"
+                loading="lazy"
+                decoding="async"
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-background/40" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card" />
             </div>
 
-            {/* Row 2: Email + Phone */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
-                >
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
-                  placeholder="your@email.com"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="phone"
-                  className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
-                >
-                  Phone *
-                </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-            </div>
-
-            {/* Row 3: Vehicle + Dates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
-              <div>
-                <label
-                  htmlFor="vehicle"
-                  className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
-                >
-                  Vehicle of Interest *
-                </label>
-                <select
-                  id="vehicle"
-                  name="vehicle"
-                  required
-                  value={formData.vehicle}
-                  onChange={handleChange}
-                  className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground focus:border-accent focus:outline-none transition-all duration-300 appearance-none text-sm lg:text-base min-h-[48px]"
-                  style={{
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%23C9A961' stroke-width='1'/%3E%3C/svg%3E")`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 1.25rem center',
-                  }}
-                >
-                  <option value="">Select a vehicle</option>
-                  <optgroup label="Exotic Cars">
-                    {vehicles.map((vehicle) => (
-                      <option key={vehicle.id} value={vehicle.id}>
-                        {vehicle.name} ({vehicle.year})
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Yacht">
-                    <option value={yacht.id}>
-                      {yacht.name} ({yacht.length})
-                    </option>
-                  </optgroup>
-                </select>
-              </div>
-              <div>
-                <label
-                  htmlFor="dates"
-                  className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
-                >
-                  Preferred Dates *
-                </label>
-                <input
-                  type="text"
-                  id="dates"
-                  name="dates"
-                  required
-                  value={formData.dates}
-                  onChange={handleChange}
-                  className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
-                  placeholder="e.g., March 15-17, 2026"
-                />
-              </div>
-            </div>
-
-            {/* Row 4: Message */}
-            <div>
-              <label
-                htmlFor="message"
-                className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+            {/* Right: Form */}
+            <div className="lg:bg-card lg:p-10 xl:p-14">
+              {/* Header */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5 }}
+                className="text-center lg:text-left mb-10 lg:mb-12"
               >
-                Additional Details
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={4}
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 resize-none text-sm lg:text-base"
-                placeholder="Any special requests or questions?"
-              />
-            </div>
+                <span className="text-accent text-[10px] lg:text-xs tracking-[0.4em] uppercase block mb-5">
+                  Begin Your Journey
+                </span>
+                <h2
+                  style={{ fontFamily: 'var(--font-serif)' }}
+                  className="text-3xl md:text-4xl lg:text-5xl text-foreground mb-5 tracking-tight"
+                >
+                  Request Availability
+                </h2>
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: 60 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                  className="h-[1px] bg-gradient-to-r from-transparent via-accent to-transparent mx-auto lg:mx-0 mb-5"
+                />
+                <p className="text-foreground/50 text-sm lg:text-base max-w-lg leading-relaxed px-4 lg:px-0">
+                  Share your details and our team will craft a tailored experience for you.
+                </p>
+              </motion.div>
 
-            {/* Error Message */}
-            <div aria-live="polite">
-              {error && (
-                <div role="alert" className="text-red-400 text-sm text-center py-3 px-4 border border-red-400/20 bg-red-400/5">
-                  {error}
+              {/* Form */}
+              <motion.form
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                onSubmit={handleSubmit}
+                className="space-y-5 lg:space-y-6"
+              >
+                {/* Row 1: Name */}
+                <div>
+                  <label
+                    htmlFor="fullName"
+                    className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                  >
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    required
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
+                    placeholder="Your name"
+                  />
                 </div>
-              )}
+
+                {/* Row 2: Email + Phone */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                    >
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
+                      placeholder="your@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="phone"
+                      className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                    >
+                      Phone *
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      required
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Vehicle + Dates */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+                  <div>
+                    <label
+                      htmlFor="vehicle"
+                      className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                    >
+                      Vehicle of Interest *
+                    </label>
+                    <select
+                      id="vehicle"
+                      name="vehicle"
+                      required
+                      value={formData.vehicle}
+                      onChange={handleChange}
+                      className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground focus:border-accent focus:outline-none transition-all duration-300 appearance-none text-sm lg:text-base min-h-[48px]"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%23C9A961' stroke-width='1'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 1.25rem center',
+                      }}
+                    >
+                      <option value="">Select a vehicle</option>
+                      <optgroup label="Exotic Cars">
+                        {vehicles.map((vehicle) => (
+                          <option key={vehicle.id} value={vehicle.id}>
+                            {vehicle.name} ({vehicle.year})
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Yacht">
+                        <option value={yacht.id}>
+                          {yacht.name} ({yacht.length})
+                        </option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="dates"
+                      className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                    >
+                      Preferred Dates *
+                    </label>
+                    <input
+                      type="text"
+                      id="dates"
+                      name="dates"
+                      required
+                      value={formData.dates}
+                      onChange={handleChange}
+                      className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 text-sm lg:text-base"
+                      placeholder="e.g., March 15-17, 2026"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 4: Message */}
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-foreground/40 text-[10px] lg:text-xs tracking-[0.2em] uppercase mb-2 lg:mb-3"
+                  >
+                    Additional Details
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full px-5 lg:px-6 py-3.5 lg:py-4 bg-background border border-border text-foreground placeholder:text-foreground/20 focus:border-accent focus:outline-none transition-all duration-300 resize-none text-sm lg:text-base"
+                    placeholder="Any special requests or questions?"
+                  />
+                </div>
+
+                {/* Error Message */}
+                <div aria-live="polite">
+                  {error && (
+                    <div role="alert" className="text-red-400 text-sm text-center py-3 px-4 border border-red-400/20 bg-red-400/5">
+                      {error}
+                    </div>
+                  )}
+                </div>
+
+                {/* Submit */}
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  whileHover={loading ? {} : { scale: 1.01, boxShadow: '0 0 40px rgba(201,169,97,0.2)' }}
+                  whileTap={loading ? {} : { scale: 0.99 }}
+                  className="group w-full px-10 py-4 lg:py-5 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase transition-all duration-300 hover:bg-accent/90 flex items-center justify-center gap-3 min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Submit Request
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+                    </>
+                  )}
+                </motion.button>
+
+                <p className="text-center lg:text-left text-[10px] lg:text-xs text-foreground/20 leading-relaxed tracking-wide">
+                  By submitting this form, you agree to be contacted by our team regarding your inquiry.
+                </p>
+              </motion.form>
             </div>
-
-            {/* Submit */}
-            <motion.button
-              type="submit"
-              disabled={loading}
-              whileHover={loading ? {} : { scale: 1.01, boxShadow: '0 0 40px rgba(201,169,97,0.2)' }}
-              whileTap={loading ? {} : { scale: 0.99 }}
-              className="group w-full px-10 py-4 lg:py-5 bg-accent text-accent-foreground text-sm tracking-[0.2em] uppercase transition-all duration-300 hover:bg-accent/90 flex items-center justify-center gap-3 min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Sending...
-                </>
-              ) : (
-                <>
-                  Submit Request
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </>
-              )}
-            </motion.button>
-
-            <p className="text-center text-[10px] lg:text-xs text-foreground/20 leading-relaxed tracking-wide">
-              By submitting this form, you agree to be contacted by our team regarding your inquiry.
-            </p>
-          </motion.form>
+          </div>
         </div>
       </div>
     </section>

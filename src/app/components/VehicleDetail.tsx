@@ -76,16 +76,14 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
   }, [onClose, goNext, goPrev]);
 
   const scrollToReservation = () => {
-    const savedY = parseInt(document.body.dataset.scrollY || '0', 10);
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    window.scrollTo(0, savedY);
+    // Dispatch event so Reservation auto-fills the vehicle select
+    window.dispatchEvent(new CustomEvent('reserve-vehicle', { detail: vehicle.id }));
+    // Close overlay — triggers exit animation (350ms) then useScrollLock cleanup restores scroll position
     onClose();
+    // Wait for exit animation + scroll lock cleanup to finish, then scroll to form
     setTimeout(() => {
       document.getElementById('reservation')?.scrollIntoView({ behavior: 'smooth' });
-    }, 200);
+    }, 500);
   };
 
   return (
@@ -126,7 +124,7 @@ export function VehicleDetail({ vehicle, onClose }: VehicleDetailProps) {
       </div>
 
       {/* Hero Image Slider */}
-      <div className="relative h-[45vh] md:h-[60vh] lg:h-[85vh] w-full overflow-hidden">
+      <div className="relative aspect-[4/3] md:aspect-[16/9] lg:aspect-[2.2/1] w-full overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.img
             key={gallery[activeIndex]}
