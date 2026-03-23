@@ -156,3 +156,15 @@ img {
 input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 1px var(--accent), 0 0 20px rgba(201, 169, 97, 0.1);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
